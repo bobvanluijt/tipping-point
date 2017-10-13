@@ -1,0 +1,18 @@
++------------------------------------+
+|    Alaska Wing Civil Air Patrol    |
+| Online Weight & Balance Calculator |
+|                                    |
+|         By Caleb Newville          |
+|    <webmaster@anchoragecap.org>    |
++------------------------------------+
+
+v0.9 31 Oct 2011
+================
+* Multi-aircraft
+* Admin interface
+* Feature complete
+
+v0.8 25 Oct 2011
+================
+* Initial functional demo release
+* Single aircraft
