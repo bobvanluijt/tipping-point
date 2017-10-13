@@ -1,20 +1,20 @@
-<?
+<?php
 include 'func.inc';
 PageHeader("Admin Interface");
 ?>
 
-<?
+<?php
 // LOGIN CHECK
 if ($_REQUEST['func'] != "login") {
 	$loginuser = $_COOKIE["loginuser"];
 	$loginpass = $_COOKIE["loginpass"];
 
-	$login_query = mysql_query("SELECT * FROM users WHERE username = '" . $loginuser . "' AND password = '" . $loginpass . "';");
+	$login_query = mysqli_query("SELECT * FROM users WHERE username = '" . $loginuser . "' AND password = '" . $loginpass . "';");
 
-	if (mysql_num_rows($login_query)!="1") {
-		header('Location: http://' . $_ENV['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?func=login&sysmsg=invalid');
+	if (mysqli_num_rows($login_query)!="1") {
+		header('Location: /admin.php?func=login&sysmsg=invalid');
 	} else {
-		$loginresult = mysql_fetch_assoc($login_query);
+		$loginresult = mysqli_fetch_assoc($login_query);
 		$loginlevel = $loginresult['superuser'];
 	}
 }
@@ -67,9 +67,9 @@ switch ($_REQUEST["func"]) {
 			foreach ($_POST as $k=>$v) {
 				if ($k!="func" && $k!="func_do") {
 					$sql_query = "UPDATE configuration SET `value` = '" . $v . "' WHERE `item` = '" . $k . "';";
-					mysql_query($sql_query);
+					mysqli_query($sql_query);
 					// Enter audit log
-					mysql_query("INSERT INTO audit (`id`, `timestamp`, `who`, `what`) VALUES (NULL, CURRENT_TIMESTAMP, '" . $loginuser . "', 'SYSTEM: " . addslashes($sql_query) . "');");
+					mysqli_query("INSERT INTO audit (`id`, `timestamp`, `who`, `what`) VALUES (NULL, CURRENT_TIMESTAMP, '" . $loginuser . "', 'SYSTEM: " . addslashes($sql_query) . "');");
 				}
 			}
     			header('Location: http://' . $_ENV["HTTP_HOST"] . $_SERVER["PHP_SELF"] . '?func=system&message=updated');
@@ -77,7 +77,7 @@ switch ($_REQUEST["func"]) {
 		default:
         		echo "<p>This module adjusts settings that affect the entire software package.</p>";
         		echo "<form method=\"post\" action=\"admin.php\"><input type=\"hidden\" name=\"func\" value=\"system\"><input type=\"hidden\" name=\"func_do\" value=\"update\">";
-	        	echo "<table align=\"center\">" 
+	        	echo "<table align=\"center\">"
 		        .    "<tr><td align=\"right\">Site/Organization Name</td><td><input type=\"text\" name=\"site_name\" value=\"" . $config['site_name'] . "\"></td></tr>"
 		        .    "<tr><td align=\"right\">Administrator E-mail Address</td><td><input type=\"email\" name=\"administrator\" value=\"" . $config['administrator'] . "\"></td></tr>"
 		        .    "<tr><td align=\"right\">Local Time Zone</td><td>";
@@ -97,11 +97,11 @@ switch ($_REQUEST["func"]) {
 					$sql_query = "INSERT INTO `polaris_wtbal`.`aircraft` (`active`, `tailnumber`, `makemodel`, `emptywt`, `emptycg`, `maxwt`, `cglimits`, `cgwarnfwd`, `cgwarnaft`) VALUES ('0', "
 					.           "'" . $_REQUEST['tailnumber'] . "', '" . $_REQUEST['makemodel'] . "', '" . $_REQUEST['emptywt'] . "', '" . $_REQUEST['emptycg'] . "', '" . $_REQUEST['maxwt'] . "', "
 					.           "'" . $_REQUEST['cglimits'] . "', '" . $_REQUEST['cgwarnfwd'] . "', '" . $_REQUEST['cgwarnaft'] . "');";
-					mysql_query($sql_query);
-					$aircraft_result = mysql_query("SELECT * FROM aircraft WHERE tailnumber='" . $_REQUEST['tailnumber'] . "'");
-					$aircraft = mysql_fetch_assoc($aircraft_result);
+					mysqli_query($sql_query);
+					$aircraft_result = mysqli_query("SELECT * FROM aircraft WHERE tailnumber='" . $_REQUEST['tailnumber'] . "'");
+					$aircraft = mysqli_fetch_assoc($aircraft_result);
 					// Enter in the audit log
-					mysql_query("INSERT INTO audit (`id`, `timestamp`, `who`, `what`) VALUES (NULL, CURRENT_TIMESTAMP, '" . $loginuser . "', '" . $aircraft['tailnumber'] . ": " . addslashes($sql_query) . "');");
+					mysqli_query("INSERT INTO audit (`id`, `timestamp`, `who`, `what`) VALUES (NULL, CURRENT_TIMESTAMP, '" . $loginuser . "', '" . $aircraft['tailnumber'] . ": " . addslashes($sql_query) . "');");
 					echo "<p>Aircraft " . $aircraft['tailnumber'] . " added successfully.  Now go to the <a href=\"admin.php?func=aircraft&amp;func_do=edit&amp;tailnumber=" . $aircraft['id'] . "\">aircraft editor</a> to complete the CG envelope and loading zones.</p>\n";
 					break;
 				default:
@@ -131,11 +131,11 @@ switch ($_REQUEST["func"]) {
 					$sql_query1 = "DELETE FROM aircraft_cg WHERE `tailnumber` = " . $_REQUEST['tailnumber'] . ";";
 					$sql_query2 = "DELETE FROM aircraft_weights WHERE `tailnumber` = " . $_REQUEST['tailnumber'] . ";";
 					$sql_query3 = "DELETE FROM aircraft WHERE `id` = " . $_REQUEST['tailnumber'] . ";";
-					mysql_query($sql_query1);
-					mysql_query($sql_query2);
-					mysql_query($sql_query3);
+					mysqli_query($sql_query1);
+					mysqli_query($sql_query2);
+					mysqli_query($sql_query3);
 					// Enter in the audit log
-					mysql_query("INSERT INTO audit (`id`, `timestamp`, `who`, `what`) VALUES (NULL, CURRENT_TIMESTAMP, '" . $loginuser . "', 'ACDELETE: " . addslashes($sql_query1) . " " . addslashes($sql_query2) . " " . addslashes($sql_query3) . "');");
+					mysqli_query("INSERT INTO audit (`id`, `timestamp`, `who`, `what`) VALUES (NULL, CURRENT_TIMESTAMP, '" . $loginuser . "', 'ACDELETE: " . addslashes($sql_query1) . " " . addslashes($sql_query2) . " " . addslashes($sql_query3) . "');");
 					header('Location: http://' . $_ENV["HTTP_HOST"] . $_SERVER["PHP_SELF"] . '?func=aircraft&sysmsg=acdeleted');
 				} else {
 					echo "<p>Aircraft NOT deleted.</p><p>In the confirmation box, you must type the words \"DELETE FOREVER\", in all caps.  Use \n"
@@ -159,8 +159,8 @@ switch ($_REQUEST["func"]) {
 			break;
 		case "edit":
 			if ($_REQUEST['tailnumber']!="") {
-				$aircraft_result = mysql_query("SELECT * FROM aircraft WHERE id='" . $_REQUEST['tailnumber'] . "'");
-				$aircraft = mysql_fetch_assoc($aircraft_result);
+				$aircraft_result = mysqli_query("SELECT * FROM aircraft WHERE id='" . $_REQUEST['tailnumber'] . "'");
+				$aircraft = mysqli_fetch_assoc($aircraft_result);
 
 				echo "<p>Editing aircraft " . $aircraft['tailnumber'] . ".</p>\n";
 
@@ -192,7 +192,7 @@ switch ($_REQUEST["func"]) {
 				echo "<h3 style=\"text-align: center\">Center of Gravity Envelope</h3>\n";
 				echo "<p style=\"text-align: center; font-size: 12px\">Enter the data points for the CG envelope.  It does not matter which point you start with or if you go clockwise or counter-clockwise, but they must be entered in order.  "
 				.    "The last point will automatically be connected back to the first.  The graph below will update as you go.</p>\n";
-				$cg_result = mysql_query("SELECT * FROM aircraft_cg WHERE tailnumber=" . $aircraft['id']);
+				$cg_result = mysqli_query("SELECT * FROM aircraft_cg WHERE tailnumber=" . $aircraft['id']);
 				echo "<form method=\"post\" action=\"admin.php\" name=\"cg\">\n";
 				echo "<input type=\"hidden\" name=\"tailnumber\" value=\"" . $aircraft['id'] . "\">\n";
 				echo "<input type=\"hidden\" name=\"func\" value=\"aircraft\">\n";
@@ -200,7 +200,7 @@ switch ($_REQUEST["func"]) {
 				echo "<input type=\"hidden\" name=\"what\" value=\"cg\">\n";
 				echo "<table align=\"center\" border=\"0\">\n";
 				echo "<tr><th>Arm</th><th>Weight</th><th>&nbsp;</th></tr>\n";
-				while($cg = mysql_fetch_assoc($cg_result)) {
+				while($cg = mysqli_fetch_assoc($cg_result)) {
 					echo "<tr><td align=\"center\"><input type=\"number\" step=\"any\" name=\"cgarm" . $cg['id'] . "\" value=\"" . $cg['arm'] . "\" class=\"numbers\"></td>\n"
 					.    "<td align=\"center\"><input type=\"number\" step=\"any\" name=\"cgweight" . $cg['id'] . "\" value=\"" . $cg['weight'] . "\" class=\"numbers\"></td><td>\n"
 					.    "<input type=\"button\" value=\"Edit\" onClick=\"parent.location='http://" . $_ENV["HTTP_HOST"] . $_SERVER["PHP_SELF"] . "?func=aircraft&amp;func_do=edit_do&amp;what=cg&amp;id=" . $cg['id'] . "&amp;cgarm=' + document.cg.cgarm" . $cg['id'] . ".value + '&amp;cgweight=' + document.cg.cgweight" . $cg['id'] . ".value + '&amp;tailnumber=" . $aircraft['id'] . "'\">\n"
@@ -209,11 +209,11 @@ switch ($_REQUEST["func"]) {
 				echo "<tr><td align=\"center\"><input type=\"number\" step=\"any\" name=\"new_arm\" class=\"numbers\"></td><td align=\"center\"><input type=\"number\" step=\"any\" name=\"new_weight\" class=\"numbers\"></td><td align=\"center\"><input type=\"submit\" value=\"Add\"></td></tr>\n";
 				echo "</table></form>\n";
 				echo "<center><img src=\"scatter.php?size=small&amp;tailnumber=" . $aircraft['id'] . "\"></center><hr noshade/>\n\n";
-								
+
 				// Aicraft loading zones
 				echo "<h3 style=\"text-align: center\">Loading Zones</h3>\n";
 				echo "<p style=\"text-align: center; font-size: 12px\">Enter the data for each reference datum.  A description of what should be entered in each field is available by hovering over the column name.</p>\n";
-				$weights_result = mysql_query("SELECT * FROM aircraft_weights WHERE tailnumber = " . $aircraft['id'] . " ORDER BY  `aircraft_weights`.`order` ASC");
+				$weights_result = mysqli_query("SELECT * FROM aircraft_weights WHERE tailnumber = " . $aircraft['id'] . " ORDER BY  `aircraft_weights`.`order` ASC");
 				echo "<form method=\"post\" action=\"admin.php\" name=\"loading\">\n";
 				echo "<input type=\"hidden\" name=\"tailnumber\" value=\"" . $aircraft['id'] . "\">\n";
 				echo "<input type=\"hidden\" name=\"func\" value=\"aircraft\">\n";
@@ -226,7 +226,7 @@ switch ($_REQUEST["func"]) {
 				.    "<th><abbr title=\"If this row is used for fuel, specify how much a gallon weighs (ie: 6 for AVGAS)\">Fuel Unit Weight</abbr></th>"
 				.    "<th><abbr title=\"The default weight to be used for a row.  If this is a fuel row, the default number of gallons.\">Weight or Gallons</abbr></th>"
 				.    "<th><abbr title=\"The number of inches from the reference datum for the row.\">Arm</abbr></th><th width=\"100\">&nbsp;</th></tr>\n";
-				while ($weights = mysql_fetch_assoc($weights_result)) {
+				while ($weights = mysqli_fetch_assoc($weights_result)) {
 					echo "<tr><td align=\"center\"><input type=\"number\" name=\"order" . $weights['id'] . "\" value=\"" . $weights['order'] . "\" class=\"numbers\" style=\"width: 35px;\"></td>\n"
 					.    "<td align=\"center\"><input type=\"text\" name=\"item" . $weights['id'] . "\" value=\"" . $weights['item'] . "\" style=\"width: 125px;\"></td>\n"
 					.    "<td align=\"center\"><input type=\"checkbox\" name=\"emptyweight" . $weights['id'] . "\" value=\"true\"";
@@ -266,40 +266,40 @@ switch ($_REQUEST["func"]) {
 					. $_REQUEST['makemodel'] . "', emptywt = '" . $_REQUEST['emptywt'] . "', emptycg = '" . $_REQUEST['emptycg'] . "', maxwt = '" . $_REQUEST['maxwt']
 					. "', cglimits = '" . $_REQUEST['cglimits'] . "', cgwarnfwd = '" . $_REQUEST['cgwarnfwd'] . "', cgwarnaft = '" . $_REQUEST['cgwarnaft'] . "' WHERE id = "
 					. $_REQUEST['id'];
-					mysql_query($sql_query);
+					mysqli_query($sql_query);
 					// Enter in the audit log
-					mysql_query("INSERT INTO audit (`id`, `timestamp`, `who`, `what`) VALUES (NULL, CURRENT_TIMESTAMP, '" . $loginuser . "', '" . $_REQUEST['tailnumber'] . ": " . addslashes($sql_query) . "');");
+					mysqli_query("INSERT INTO audit (`id`, `timestamp`, `who`, `what`) VALUES (NULL, CURRENT_TIMESTAMP, '" . $loginuser . "', '" . $_REQUEST['tailnumber'] . ": " . addslashes($sql_query) . "');");
 					header('Location: http://' . $_ENV["HTTP_HOST"] . $_SERVER["PHP_SELF"] . '?func=aircraft&func_do=edit&tailnumber=' . $_REQUEST['id'] . '&message=updated');
 					break;
 				case "cg":
 					if ($_REQUEST['new_arm'] != "" && $_REQUEST['new_weight'] != "") {
 						// SQL query to add a new CG line
 						$sql_query = "INSERT INTO aircraft_cg (`id`, `tailnumber`, `arm`, `weight`) VALUES (NULL, '" . $_REQUEST['tailnumber'] . "', '" . $_REQUEST['new_arm'] . "', '" . $_REQUEST['new_weight'] . "');";
-						mysql_query($sql_query);
+						mysqli_query($sql_query);
 						// Enter in the audit log
-						$aircraft_query = mysql_query("SELECT * FROM aircraft WHERE id = " . $_REQUEST['tailnumber']);
-						$aircraft = mysql_fetch_assoc($aircraft_query);
-						mysql_query("INSERT INTO audit (`id`, `timestamp`, `who`, `what`) VALUES (NULL, CURRENT_TIMESTAMP, '" . $loginuser . "', '" . $aircraft['tailnumber'] . ": " . addslashes($sql_query) . "');");
+						$aircraft_query = mysqli_query("SELECT * FROM aircraft WHERE id = " . $_REQUEST['tailnumber']);
+						$aircraft = mysqli_fetch_assoc($aircraft_query);
+						mysqli_query("INSERT INTO audit (`id`, `timestamp`, `who`, `what`) VALUES (NULL, CURRENT_TIMESTAMP, '" . $loginuser . "', '" . $aircraft['tailnumber'] . ": " . addslashes($sql_query) . "');");
 						header('Location: http://' . $_ENV["HTTP_HOST"] . $_SERVER["PHP_SELF"] . '?func=aircraft&func_do=edit&tailnumber=' . $_REQUEST['tailnumber'] . '&message=updated');
 					} else {
 						// SQL query to edit CG information
 						$sql_query = "UPDATE aircraft_cg SET arm = '" . $_REQUEST['cgarm'] . "', weight = '" . $_REQUEST['cgweight'] . "' WHERE id = '" . $_REQUEST['id'] . "';";
-						mysql_query($sql_query);
+						mysqli_query($sql_query);
 						// Enter in the audit log
-						$aircraft_query = mysql_query("SELECT * FROM aircraft WHERE id = " . $_REQUEST['tailnumber']);
-						$aircraft = mysql_fetch_assoc($aircraft_query);
-						mysql_query("INSERT INTO audit (`id`, `timestamp`, `who`, `what`) VALUES (NULL, CURRENT_TIMESTAMP, '" . $loginuser . "', '" . $aircraft['tailnumber'] . ": " . addslashes($sql_query) . "');");
+						$aircraft_query = mysqli_query("SELECT * FROM aircraft WHERE id = " . $_REQUEST['tailnumber']);
+						$aircraft = mysqli_fetch_assoc($aircraft_query);
+						mysqli_query("INSERT INTO audit (`id`, `timestamp`, `who`, `what`) VALUES (NULL, CURRENT_TIMESTAMP, '" . $loginuser . "', '" . $aircraft['tailnumber'] . ": " . addslashes($sql_query) . "');");
 						header('Location: http://' . $_ENV["HTTP_HOST"] . $_SERVER["PHP_SELF"] . '?func=aircraft&func_do=edit&tailnumber=' . $_REQUEST['tailnumber'] . '&message=updated');
 					}
 					break;
 				case "cg_del":
 					// SQL query to delete CG information
 					$sql_query = "DELETE FROM aircraft_cg WHERE id = " . $_REQUEST['id'];
-					mysql_query($sql_query);
+					mysqli_query($sql_query);
 					// Enter in the audit log
-					$aircraft_query = mysql_query("SELECT * FROM aircraft WHERE id = " . $_REQUEST['tailnumber']);
-					$aircraft = mysql_fetch_assoc($aircraft_query);
-					mysql_query("INSERT INTO audit (`id`, `timestamp`, `who`, `what`) VALUES (NULL, CURRENT_TIMESTAMP, '" . $loginuser . "', '" . $aircraft['tailnumber'] . ": " . addslashes($sql_query) . "');");
+					$aircraft_query = mysqli_query("SELECT * FROM aircraft WHERE id = " . $_REQUEST['tailnumber']);
+					$aircraft = mysqli_fetch_assoc($aircraft_query);
+					mysqli_query("INSERT INTO audit (`id`, `timestamp`, `who`, `what`) VALUES (NULL, CURRENT_TIMESTAMP, '" . $loginuser . "', '" . $aircraft['tailnumber'] . ": " . addslashes($sql_query) . "');");
 					header('Location: http://' . $_ENV["HTTP_HOST"] . $_SERVER["PHP_SELF"] . '?func=aircraft&func_do=edit&tailnumber=' . $_REQUEST['tailnumber'] . '&message=updated');
 				case "loading":
 					if ($_REQUEST['new_item'] && $_REQUEST['new_arm'] != "") {
@@ -312,32 +312,32 @@ switch ($_REQUEST["func"]) {
 						if ($_REQUEST['new_fuel']=="true") { $sql_query = $sql_query . ", 'true'"; }
 						if ($_REQUEST['new_emptyweight']=="true") { $sql_query = $sql_query . ", 'true'"; }
 						$sql_query = $sql_query . ");";
-						mysql_query($sql_query);
+						mysqli_query($sql_query);
 						// Enter in the audit log
-						$aircraft_query = mysql_query("SELECT * FROM aircraft WHERE id = " . $_REQUEST['tailnumber']);
-						$aircraft = mysql_fetch_assoc($aircraft_query);
-						mysql_query("INSERT INTO audit (`id`, `timestamp`, `who`, `what`) VALUES (NULL, CURRENT_TIMESTAMP, '" . $loginuser . "', '" . $aircraft['tailnumber'] . ": " . addslashes($sql_query) . "');");
+						$aircraft_query = mysqli_query("SELECT * FROM aircraft WHERE id = " . $_REQUEST['tailnumber']);
+						$aircraft = mysqli_fetch_assoc($aircraft_query);
+						mysqli_query("INSERT INTO audit (`id`, `timestamp`, `who`, `what`) VALUES (NULL, CURRENT_TIMESTAMP, '" . $loginuser . "', '" . $aircraft['tailnumber'] . ": " . addslashes($sql_query) . "');");
 						header('Location: http://' . $_ENV["HTTP_HOST"] . $_SERVER["PHP_SELF"] . '?func=aircraft&func_do=edit&tailnumber=' . $_REQUEST['tailnumber'] . '&message=updated');
 					} else {
 						// SQL query to edit loading zones
 						$sql_query = "UPDATE aircraft_weights SET `order` = '" . $_REQUEST['order'] . "', `item` = '" . $_REQUEST['item'] . "', `weight` = '" . $_REQUEST['weight'] . "', `arm` = '" . $_REQUEST['arm']
 						.            "', `emptyweight` = '" . $_REQUEST['emptyweight'] . "', `fuel` = '" . $_REQUEST['fuel'] . "', `fuelwt` = '" . $_REQUEST['fuelwt'] . "' WHERE id = '" . $_REQUEST['id'] . "';";
-						mysql_query($sql_query);
+						mysqli_query($sql_query);
 						// Enter in the audit log
-						$aircraft_query = mysql_query("SELECT * FROM aircraft WHERE id = " . $_REQUEST['tailnumber']);
-						$aircraft = mysql_fetch_assoc($aircraft_query);
-						mysql_query("INSERT INTO audit (`id`, `timestamp`, `who`, `what`) VALUES (NULL, CURRENT_TIMESTAMP, '" . $loginuser . "', '" . $aircraft['tailnumber'] . ": " . addslashes($sql_query) . "');");
+						$aircraft_query = mysqli_query("SELECT * FROM aircraft WHERE id = " . $_REQUEST['tailnumber']);
+						$aircraft = mysqli_fetch_assoc($aircraft_query);
+						mysqli_query("INSERT INTO audit (`id`, `timestamp`, `who`, `what`) VALUES (NULL, CURRENT_TIMESTAMP, '" . $loginuser . "', '" . $aircraft['tailnumber'] . ": " . addslashes($sql_query) . "');");
 						header('Location: http://' . $_ENV["HTTP_HOST"] . $_SERVER["PHP_SELF"] . '?func=aircraft&func_do=edit&tailnumber=' . $_REQUEST['tailnumber'] . '&message=updated');
 					}
 					break;
 				case "loading_del":
 					// SQL query to delete loading information
 					$sql_query = "DELETE FROM aircraft_weights WHERE id = " . $_REQUEST['id'];
-					mysql_query($sql_query);
+					mysqli_query($sql_query);
 					// Enter in the audit log
-					$aircraft_query = mysql_query("SELECT * FROM aircraft WHERE id = " . $_REQUEST['tailnumber']);
-					$aircraft = mysql_fetch_assoc($aircraft_query);
-					mysql_query("INSERT INTO audit (`id`, `timestamp`, `who`, `what`) VALUES (NULL, CURRENT_TIMESTAMP, '" . $loginuser . "', '" . $aircraft['tailnumber'] . ": " . addslashes($sql_query) . "');");
+					$aircraft_query = mysqli_query("SELECT * FROM aircraft WHERE id = " . $_REQUEST['tailnumber']);
+					$aircraft = mysqli_fetch_assoc($aircraft_query);
+					mysqli_query("INSERT INTO audit (`id`, `timestamp`, `who`, `what`) VALUES (NULL, CURRENT_TIMESTAMP, '" . $loginuser . "', '" . $aircraft['tailnumber'] . ": " . addslashes($sql_query) . "');");
 					header('Location: http://' . $_ENV["HTTP_HOST"] . $_SERVER["PHP_SELF"] . '?func=aircraft&func_do=edit&tailnumber=' . $_REQUEST['tailnumber'] . '&message=updated');
 			}
 
@@ -361,9 +361,9 @@ switch ($_REQUEST["func"]) {
 				// SQL query to add a new user
 				$sql_query = "INSERT INTO users (`username`, `password`, `name`, `email`, `superuser`) "
 				.            "VALUES ('" . $_REQUEST['username'] . "', '" . $_REQUEST['password'] . "', '" . $_REQUEST['name'] . "', '" . $_REQUEST['email'] . "', '" . $_REQUEST['superuser'] . "');";
-				mysql_query($sql_query);
+				mysqli_query($sql_query);
 				// Enter in the audit log
-				mysql_query("INSERT INTO audit (`id`, `timestamp`, `who`, `what`) VALUES (NULL, CURRENT_TIMESTAMP, '" . $loginuser . "', 'USERS: " . addslashes($sql_query) . "');");
+				mysqli_query("INSERT INTO audit (`id`, `timestamp`, `who`, `what`) VALUES (NULL, CURRENT_TIMESTAMP, '" . $loginuser . "', 'USERS: " . addslashes($sql_query) . "');");
 				header('Location: http://' . $_ENV["HTTP_HOST"] . $_SERVER["PHP_SELF"] . '?func=users&message=added');
 			} else {
 				echo "<form method=\"post\" action=\"admin.php\">\n"
@@ -386,19 +386,19 @@ switch ($_REQUEST["func"]) {
 				if ($_REQUEST['password']!="") { $sql_query = $sql_query . "`password` = '" . PassEncode($_REQUEST['password']) . "', "; }
 				$sql_query = $sql_query . "`name` = '" . $_REQUEST['name'] . "', `email` = '" . $_REQUEST['email'] . "', `superuser` = '" . $_REQUEST['superuser']
 				. "' WHERE id = '" . $_REQUEST['id'] . "';";
-				mysql_query($sql_query);
+				mysqli_query($sql_query);
 				// Enter in the audit log
-				mysql_query("INSERT INTO audit (`id`, `timestamp`, `who`, `what`) VALUES (NULL, CURRENT_TIMESTAMP, '" . $loginuser . "', 'USERS: " . addslashes($sql_query) . "');");
+				mysqli_query("INSERT INTO audit (`id`, `timestamp`, `who`, `what`) VALUES (NULL, CURRENT_TIMESTAMP, '" . $loginuser . "', 'USERS: " . addslashes($sql_query) . "');");
 				header('Location: http://' . $_ENV["HTTP_HOST"] . $_SERVER["PHP_SELF"] . '?func=users&message=edited');
 			} elseif ($_REQUEST['what']=="Delete") {
 				$sql_query = "DELETE FROM users WHERE id = '" . $_REQUEST['id'] . "';";
-				mysql_query($sql_query);
+				mysqli_query($sql_query);
 				// Enter in the audit log
-				mysql_query("INSERT INTO audit (`id`, `timestamp`, `who`, `what`) VALUES (NULL, CURRENT_TIMESTAMP, '" . $loginuser . "', 'USERS: " . addslashes($sql_query) . "');");
+				mysqli_query("INSERT INTO audit (`id`, `timestamp`, `who`, `what`) VALUES (NULL, CURRENT_TIMESTAMP, '" . $loginuser . "', 'USERS: " . addslashes($sql_query) . "');");
 				header('Location: http://' . $_ENV["HTTP_HOST"] . $_SERVER["PHP_SELF"] . '?func=users&message=deleted');
 			} else {
-				$result = mysql_query("SELECT * FROM users WHERE id = " . $_REQUEST['id']);
-				$row = mysql_fetch_assoc($result);
+				$result = mysqli_query("SELECT * FROM users WHERE id = " . $_REQUEST['id']);
+				$row = mysqli_fetch_assoc($result);
 				echo "<form method=\"post\" action=\"admin.php\">\n"
 				.    "<input type=\"hidden\" name=\"id\" value=\"" . $row['id'] . "\">\n"
 				.    "<input type=\"hidden\" name=\"func\" value=\"users\">\n"
@@ -423,8 +423,8 @@ switch ($_REQUEST["func"]) {
 		        echo "<input type=\"hidden\" name=\"func_do\" value=\"add\">\n";
 			echo "<table align=\"center\" border=\"1\">\n";
 			echo "<tr><th>Username</th><th>Name</th><th>Admin</th><th>&nbsp;</th></tr>\n";
-			$result = mysql_query("SELECT * FROM users ORDER BY `name`");
-			while($row = mysql_fetch_array($result)) {
+			$result = mysqli_query("SELECT * FROM users ORDER BY `name`");
+			while($row = mysqli_fetch_array($result)) {
 				echo "<tr><td>" . $row['username'] . "</td><td>" . $row['name'] . "</td><td>";
 				if ($row['superuser']=="1") { echo "Yes"; } else { echo "No"; }
 				echo "</td><td>\n";
@@ -449,9 +449,9 @@ switch ($_REQUEST["func"]) {
     	echo "<div style=\"font-family: courier; font-size: 10px;\">";
     	if ($_REQUEST['offset']=="") { $lower=0;
     	} else { $lower=$_REQUEST['offset']; } $upper=($lower+100);
-    	$result = mysql_query("SELECT * FROM audit ORDER BY timestamp DESC LIMIT " . $lower . " , " . $upper);
-    	$rowcount = mysql_num_rows(mysql_query("SELECT * FROM audit"));
-    	while ($row = mysql_fetch_array($result)) {
+    	$result = mysqli_query("SELECT * FROM audit ORDER BY timestamp DESC LIMIT " . $lower . " , " . $upper);
+    	$rowcount = mysqli_num_rows(mysqli_query("SELECT * FROM audit"));
+    	while ($row = mysqli_fetch_array($result)) {
     		echo $row['timestamp'] . " | " . $row['who'] . " | " . $row['what'] . "<br><br>\n";
     	}
     	echo "</div><center>";
@@ -469,4 +469,4 @@ switch ($_REQUEST["func"]) {
 echo "</td></tr></table>";
 ?>
 
-<? PageFooter($config['administrator'],$ver); ?>
+<?php PageFooter($config['administrator'],$ver); ?>

@@ -307,6 +307,7 @@
 </script>
 </html>
 <?php
+
  function checkPHPVersion()
   {
    $PHPVersion	= phpversion();
@@ -336,7 +337,7 @@
   <div style='padding: 4px; font-family: tahoma; font-size: 11px;' align='justify'>
    It seems that you're not meeting the pChart minimal server requirements:
    <br><br>
-   &nbsp;&nbsp;-&nbsp;PHP must be at least <b>4.x</b><br/>
+   &nbsp;&nbsp;-&nbsp;qqqPHP must be at least <b>4.x</b><br/>
    &nbsp;&nbsp;-&nbsp;GD version <b>2.x</b><br/>
   </div>
  </div>

@@ -1,8 +1,8 @@
 <?php
 include 'func.inc';
 // GET AIRCRAFT CG DATA
-$result = mysql_query("SELECT * FROM aircraft_cg WHERE tailnumber=" . $_REQUEST['tailnumber']);
-while($row = mysql_fetch_array($result)) {
+$result = mysqli_query("SELECT * FROM aircraft_cg WHERE tailnumber=" . $_REQUEST['tailnumber']);
+while($row = mysqli_fetch_array($result)) {
 	$arm[] = $row['arm'];
 	$weight[] = $row['weight'];
 }
@@ -20,7 +20,7 @@ while($row = mysql_fetch_array($result)) {
  include("pChart/class/pScatter.class.php");
 
  /* Create the pData object */
- $myData = new pData();  
+ $myData = new pData();
 
  /* Create the X axis and the binded series */
  $myData->addPoints($arm,"EnvelopeCG");
@@ -63,7 +63,7 @@ while($row = mysql_fetch_array($result)) {
 
  /* Set the default font */
  $myPicture->setFontProperties(array("FontName"=>"pChart/fonts/verdana.ttf","FontSize"=>8));
- 
+
  /* Create the Scatter chart object */
  $myScatter = new pScatter($myPicture,$myData);
 
@@ -75,9 +75,9 @@ while($row = mysql_fetch_array($result)) {
 
  /* Draw a scatter line chart */
   $myScatter->drawScatterLineChart();
- 
 
- 
+
+
  //caleb
  /* Draw a scatter plot chart */
 $myData->setSerieDrawable(0,FALSE);
@@ -85,11 +85,11 @@ $myData->setSerieDrawable(0,FALSE);
   /* Create the X axis and the binded series */
  $myData->addPoints($_GET["totarm"],"MyCG");
  $myData->setSerieOnAxis("MyCG",0);
- 
+
  /* Create the Y axis and the binded series */
  $myData->addPoints($_GET["totwt"],"MyWeight");
   $myData->setSerieOnAxis("MyWeight",1);
- 
+
  /* Create the 2nd scatter chart binding */
  $myData->setScatterSerie("MyCG","MyWeight",1);
  $myData->setScatterSerieDescription(1,"My CG");
@@ -98,11 +98,11 @@ $myData->setSerieDrawable(0,FALSE);
  /* Create data value label */
  $LabelSettings = array("Decimals"=>1,"NoTitle"=>TRUE);
  $myScatter->writeScatterLabel(1,0,$LabelSettings);
- 
+
 /* Draw a scatter plot chart */
 $myScatter->drawScatterPlotChart();
- 
- 
+
+
 
  /* Render the picture (choose the best way) */
  $myPicture->stroke();

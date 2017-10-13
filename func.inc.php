@@ -1,18 +1,20 @@
-<?
+<?php
 
 /* VARIABLES */
 $ver = "0.9";
 $tabindex=1;
 
-$dbname="polaris_wtbal";
-$dbuser="polaris_wtbal";
-$dbpass="Anch0rageCAP";
+$dbname=""; // EDIT
+$dbuser=""; // EDIT
+$dbpass=""; // EDIT
 
-$con = mysql_connect("localhost",$dbuser,$dbpass);
-mysql_select_db($dbname, $con);
+/* DON'T CHANGE BELOW */
 
-$config_result = mysql_query("SELECT * FROM configuration");
-while($config_row = mysql_fetch_assoc($config_result)) {
+$con = mysqli_connect("localhost",$dbuser,$dbpass);
+mysqli_select_db($dbname, $con);
+
+$config_result = mysqli_query("SELECT * FROM configuration");
+while($config_row = mysqli_fetch_assoc($config_result)) {
   $config{$config_row['item']}=$config_row['value'];
 }
 
@@ -21,10 +23,10 @@ function PageHeader($site_name) {
 	?>
 	<html>
 	<head>
-	<title>WEIGHT AND BALANCE CALCULATOR - <? echo($site_name); ?></title>
+	<title>WEIGHT AND BALANCE CALCULATOR - <?=$site_name?></title>
 
 	<style type="text/css">
-	<!--
+
 	body {font-family: Cambria, Tahoma, Verdana; font-size: 12px;}
 	input, select {font-family: Cambria, Tahoma, Verdana; font-size: 11px; border:1px solid #AAAAAA;}
 	h2,h3 {color: 17365D}
@@ -34,17 +36,17 @@ function PageHeader($site_name) {
 	.numbers {text-align: right; width: 70px;}
 	.numbergals {text-align: right; width: 40px;}
 	@media print { .noprint { display: none; } }
-	-->
+
 	</style>
-	<?
+	<?php
 }
 
 function PageFooter($admin,$ver) {
 	?>
-	<p class="noprint" style="text-align:center; font-size:12px;"><i>Questions? Suggestions?  <a href="mailto:<? echo($admin); ?>?subj=[Weight%20&%20Balance%20Tool]"><? echo($admin); ?></a><br>
-	<a href=\"http://sourceforge.net/p/tippingpoint\" target=\"_blank\">Tipping Point - Open Source Weight &amp; Balance Software</a> - Version <a href="changelog.txt" target="_blank"><? echo($ver); ?></a></i></p>
+	<p class="noprint" style="text-align:center; font-size:12px;"><i>Questions? Suggestions?  <a href="mailto:<?php echo($admin); ?>?subj=[Weight%20&%20Balance%20Tool]"><?php echo($admin); ?></a><br>
+	<a href=\"http://sourceforge.net/p/tippingpoint\" target=\"_blank\">Tipping Point - Open Source Weight &amp; Balance Software</a> - Version <a href="changelog.txt" target="_blank"><?php echo($ver); ?></a></i></p>
 	</body></html>
-	<?
+	<?php
 	ob_end_flush();
 }
 
@@ -75,7 +77,7 @@ function TimezoneList($str) {
 		            if ($str==$value) {
 		            	echo " selected";
 		            }
-		            echo ">".$city."</option>\n";               
+		            echo ">".$city."</option>\n";
 	        }
 	}
 	echo("</optgroup></select>");
@@ -83,8 +85,8 @@ function TimezoneList($str) {
 
 function AircraftListActive() {
 	echo "<select name=\"tailnumber\">\n";
-	$result = mysql_query("SELECT * FROM aircraft WHERE active=1 ORDER BY tailnumber ASC");
-	while($row = mysql_fetch_array($result)) {
+	$result = mysqli_query("SELECT * FROM aircraft WHERE active=1 ORDER BY tailnumber ASC");
+	while($row = mysqli_fetch_array($result)) {
 		echo "<option value=\"" . $row['id'] . "\">" . $row['tailnumber'] . " - " . $row['makemodel'] . "</option>\n";
 	}
 	echo "</select>\n";
@@ -93,14 +95,14 @@ function AircraftListActive() {
 function AircraftListAll() {
 	echo "<select name=\"tailnumber\">\n";
 	echo "<optgroup label=\"Active\">\n";
-	$result = mysql_query("SELECT * FROM aircraft WHERE active=1 ORDER BY tailnumber ASC");
-	while($row = mysql_fetch_array($result)) {
+	$result = mysqli_query("SELECT * FROM aircraft WHERE active=1 ORDER BY tailnumber ASC");
+	while($row = mysqli_fetch_array($result)) {
 		echo "<option value=\"" . $row['id'] . "\">" . $row['tailnumber'] . " - " . $row['makemodel'] . "</option>\n";
 	}
 	echo "</optgroup>\n";
 	echo "<optgroup label=\"Inactive\">\n";
-	$result = mysql_query("SELECT * FROM aircraft WHERE active=0 ORDER BY tailnumber ASC");
-	while($row = mysql_fetch_array($result)) {
+	$result = mysqli_query("SELECT * FROM aircraft WHERE active=0 ORDER BY tailnumber ASC");
+	while($row = mysqli_fetch_array($result)) {
 		echo "<option value=\"" . $row['id'] . "\">" . $row['tailnumber'] . " - " . $row['makemodel'] . "</option>\n";
 	}
 	echo "</optgroup>\n";

@@ -1,7 +1,7 @@
-<? include 'func.inc';
+<?php include 'func.inc';
    PageHeader($config['site_name']); ?>
 
-<?
+<?php
 if ($_REQUEST['tailnumber']=="") {
 // NO AIRCRAFT SPECIFIED, SHOW ACTIVE AIRCRAFT LIST
 
@@ -21,11 +21,10 @@ if ($_REQUEST['tailnumber']=="") {
 // AIRCRAFT SELECTED, DO WEIGHT & BALANCE
 
 	// GET AIRCRAFT INFORMATION
-	$aircraft_result = mysql_query("SELECT * FROM aircraft WHERE id=" . $_REQUEST['tailnumber']);
-	$aircraft = mysql_fetch_assoc($aircraft_result);
+	$aircraft_result = mysqli_query("SELECT * FROM aircraft WHERE id=" . $_REQUEST['tailnumber']);
+	$aircraft = mysqli_fetch_assoc($aircraft_result);
 
 ?>
-
 
 <script type="text/javascript">
 
@@ -33,10 +32,10 @@ if ($_REQUEST['tailnumber']=="") {
 function WeightBal() {
   var df = document.forms[0];
 
-<?
+<?php
 
-$weights_query = mysql_query("SELECT * FROM aircraft_weights WHERE tailnumber = " . $aircraft['id'] . " ORDER BY 'order' ASC");
-while($weights = mysql_fetch_assoc($weights_query)) {
+$weights_query = mysqli_query("SELECT * FROM aircraft_weights WHERE tailnumber = " . $aircraft['id'] . " ORDER BY 'order' ASC");
+while($weights = mysqli_fetch_assoc($weights_query)) {
 	if ($weights['fuel']=="true") {
 		echo "df.line" . $weights['id'] . "_gallons.value = ";
 			if (empty($_GET["line" . $weights['id'] . "_gallons"])) {echo($weights['weight']);} else { echo($_GET["line" . $weights['id'] . "_gallons"]); }
@@ -60,10 +59,10 @@ while($weights = mysql_fetch_assoc($weights_query)) {
 function Process() {
   var df = document.forms[0];
 
-<?
+<?php
 
-$weights_query = mysql_query("SELECT * FROM aircraft_weights WHERE tailnumber = " . $aircraft['id'] . " ORDER BY 'order' ASC");
-while($weights = mysql_fetch_assoc($weights_query)) {
+$weights_query = mysqli_query("SELECT * FROM aircraft_weights WHERE tailnumber = " . $aircraft['id'] . " ORDER BY 'order' ASC");
+while($weights = mysqli_fetch_assoc($weights_query)) {
 	if ($weights['fuel']=="true") {
 		echo "var line" . $weights['id'] . "_gallons = df.line" . $weights['id'] . "_gallons.value;\n";
 		echo "var line" . $weights['id'] . "_wt = line" . $weights['id'] . "_gallons * " . $weights['fuelwt'] . ";\n";
@@ -91,7 +90,7 @@ echo "var c1 = " . $aircraft['cgwarnfwd'] .";\n";
 echo "var w2 = " . $aircraft['emptywt'] . ";\n";
 echo "var c2 = " . $aircraft['cgwarnaft'] . ";\n";
 echo "var overt  = Math.round(totwt - " . $aircraft['maxwt'] . ");\n\n";
-  
+
 echo "document.wbimage.src = 'scatter.php?tailnumber=" . $aircraft['id'] . "&totarm=' + totarm + '&totwt=' + totwt;\n";
 
 ?>
@@ -136,7 +135,7 @@ if  (parseFloat(Math.round(totarm*100)/100)<c1) {
         alert(message)
         inuse_flag = false
     }
- } 
+ }
 // -->
 
 isamap = new Object();
@@ -154,36 +153,36 @@ isamap[3] = "_dn"
 <tr>
 	<td colspan="4" rowspan="6">
 
-<h2><? echo $config['site_name'] . "<br>" . $aircraft['makemodel'] . " " . $aircraft['tailnumber'];
+<h2><?php echo $config['site_name'] . "<br>" . $aircraft['makemodel'] . " " . $aircraft['tailnumber'];
 	echo "<div class=\"noprint\"><input type=\"button\" value=\"Choose Another Aircraft\" class=\"noprint\" style=\"vertical-align: middle\" onClick=\"parent.location='wtbal.php'\"></div>"; ?></h2>
-	
-	<FORM method="get" action="wtbal.php"><input type="hidden" name="tailnumber" value="<? echo($aircraft['id']); ?>">
+
+	<FORM method="get" action="wtbal.php"><input type="hidden" name="tailnumber" value="<?php echo($aircraft['id']); ?>">
 
 <p class="noprint"><font size="-1"><b><i>Replace default weights with your actual weights, then click "Calculate".</i></b></p>
 
 <p><b>PILOT SIGNATURE  X__________________________________________________</b><br>
 <font size="-2">The Pilot In Command is responsible for ensuring all calculations are correct and safe before conducting flight activities.</font><br>
-<? date_default_timezone_set($config['timezone']); echo date("D, j M Y H:i:s T"); ?></font>
+<?php date_default_timezone_set($config['timezone']); echo date("D, j M Y H:i:s T"); ?></font>
 </td>
 
 	<th>Empty Wt</th>
 </tr>
-<tr><td><font size="-1"><center><? echo $aircraft['emptywt']; ?></center></font></td></tr>
+<tr><td><font size="-1"><center><?php echo $aircraft['emptywt']; ?></center></font></td></tr>
 <tr><th>Empty CG</th></tr>
-<tr><td><font size="-1"><center><? echo $aircraft['emptycg']; ?></center></font></td></tr>
+<tr><td><font size="-1"><center><?php echo $aircraft['emptycg']; ?></center></font></td></tr>
 <tr><th>MGW</th></tr>
-<tr><td><font size="-1"><center><? echo $aircraft['maxwt']; ?></center></font></td></tr>
-		
+<tr><td><font size="-1"><center><?php echo $aircraft['maxwt']; ?></center></font></td></tr>
+
 <tr>
 <th width="40%" colspan="2">Item</th>
 <th width="20%">Weight</th>
 <th width="20%">Arm</th>
 <th width="20%">Moment</th>
 
-<?
+<?php
 
-$weights_query = mysql_query("SELECT * FROM aircraft_weights WHERE tailnumber = " . $aircraft['id'] . " ORDER BY  `aircraft_weights`.`order` ASC");
-while($weights = mysql_fetch_assoc($weights_query)) {
+$weights_query = mysqli_query("SELECT * FROM aircraft_weights WHERE tailnumber = " . $aircraft['id'] . " ORDER BY  `aircraft_weights`.`order` ASC");
+while($weights = mysqli_fetch_assoc($weights_query)) {
 	echo "<tr><td";
 	if ($weights['fuel']=="false") {
 		echo " colspan=\"2\"";
@@ -218,29 +217,29 @@ while($weights = mysql_fetch_assoc($weights_query)) {
 <tr bgcolor="#FFFF80">
 <td colspan="2">
 	<font size="-1"><b>CG limits: </b></font>
-	<font size="-1" face="courier"><? echo $aircraft['cglimits']; ?></font></td>
-<TD COLSPAN=1 ALIGN="Right"><B>Takeoff C.G.</B></TD>
+	<font size="-1" face="courier"><?php echo $aircraft['cglimits']; ?></font></td>
+<TD COLSPAN="1" ALIGN="Right"><B>Takeoff C.G.</B></TD>
 <TD align="center"><input type="number" name="totarm" maxlength="5" readonly class="readonly numbers"></TD>
 <td>&nbsp;</td>
 </tr>
 
 <tr class="noprint">
-<td COLSPAN=5>
-<center><input type="submit" name="Submit" value=" Calculate " tabindex="<? echo($tabindex); $tabindex++; ?>" onClick="Process()">&nbsp;&nbsp;
+<td COLSPAN="5">
+<center><input type="submit" name="Submit" value=" Calculate " tabindex="<?php echo($tabindex); $tabindex++; ?>" onClick="Process()">&nbsp;&nbsp;
 <input type="button" name="Reset" value="Reset" onclick="WeightBal()">&nbsp;&nbsp;
 <input type="button" value="Print" onClick="window.print()"></center>
 
 </td></tr>
 </TABLE>
 
-<? echo("<img name=\"wbimage\">"); ?>
+<?php echo("<img name=\"wbimage\">"); ?>
 </center>
 </FORM>
 
-<?
+<?php
 }
 ?>
 
-<? PageFooter($config['administrator'],$ver);
-mysql_close($con);
+<?php PageFooter($config['administrator'],$ver);
+mysqli_close($con);
 ?>
