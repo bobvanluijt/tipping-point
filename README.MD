@@ -23,7 +23,10 @@ Things we would like to add in the future:
 
 ### Install
 
+_Note optimized for php7.1_
+
 To Install:
+0) Make sure to install php7.0-xml.
 1) Download the code and SQL file
 2) Use the SQL file to create to create the blank database
 3) Manually add a user account to the "users" table in the database,
