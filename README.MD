@@ -1,18 +1,15 @@
+# TippingPoint - Aircraft Weight & Balance
+
 _NOTE: This is a clone of the open source version of tipping point on [source force](https://sourceforge.net/projects/tippingpoint). Project isn't updated since 2012. This code base contains some minor bug fixes._
 
--------
-
-TippingPoint - Aircraft Weight & Balance
-OLD: http://sourceforge.net/p/tippingpoint
-NEW: https://github.com/bobvanluijt/tipping-point
-
-========================================
+- OLD: http://sourceforge.net/p/tippingpoint
+- NEW: https://github.com/bobvanluijt/tipping-point
 
 Tipping point is a web-based aircraft weight and balance calculator with
 graphing. It has support for multiple aircraft and administrators. The software
 requires PHP and MySQL, and utilizes the pChart graphing library.
 
-========================================
+### Info
 
 This is a final pre-production release.
 
@@ -24,7 +21,7 @@ Things we would like to add in the future:
 * Multiple weight envelopes on the graph (ie: normal category, utility category)
 * "e-file" weight and balance (no printing and signing)
 
-========================================
+### Install
 
 To Install:
 1) Download the code and SQL file
@@ -33,15 +30,3 @@ To Install:
    leave the password field blank
 4) Extract the code
 5) Edit "func.inc", fill in your MySQL server information
-
-========================================
-
-Notes:
-This software utilizes the pChart graphing library, ensure that you comply
-with the license terms of their software: http://www.pchart.net/license
-
-========================================
-
-Feedback/Contributing:
-Please submit bugs, code improvements or other feedback on the project's
-SourceForge site: https://github.com/bobvanluijt/tipping-point/issues
