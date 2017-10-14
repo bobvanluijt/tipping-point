@@ -1,5 +1,5 @@
 <?php
-include 'func.inc';
+include 'func.inc.php';
 PageHeader("Admin Interface");
 ?>
 

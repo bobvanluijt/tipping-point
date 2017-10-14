@@ -1,4 +1,4 @@
-<?php include 'func.inc';
+<?php include 'func.inc.php';
    PageHeader($config['site_name']); ?>
 
 <?php

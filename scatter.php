@@ -1,5 +1,5 @@
 <?php
-include 'func.inc';
+include 'func.inc.php';
 // GET AIRCRAFT CG DATA
 $result = mysqli_query("SELECT * FROM aircraft_cg WHERE tailnumber=" . $_REQUEST['tailnumber']);
 while($row = mysqli_fetch_array($result)) {
