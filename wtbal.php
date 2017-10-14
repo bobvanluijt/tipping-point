@@ -21,7 +21,7 @@ if ($_REQUEST['tailnumber']=="") {
 // AIRCRAFT SELECTED, DO WEIGHT & BALANCE
 
 	// GET AIRCRAFT INFORMATION
-	$aircraft_result = mysqli_query("SELECT * FROM aircraft WHERE id=" . $_REQUEST['tailnumber']);
+	$aircraft_result = mysqli_query($GLOBALS['dbLink'], "SELECT * FROM aircraft WHERE id=" . $_REQUEST['tailnumber']);
 	$aircraft = mysqli_fetch_assoc($aircraft_result);
 
 ?>
@@ -34,7 +34,7 @@ function WeightBal() {
 
 <?php
 
-$weights_query = mysqli_query("SELECT * FROM aircraft_weights WHERE tailnumber = " . $aircraft['id'] . " ORDER BY 'order' ASC");
+$weights_query = mysqli_query($GLOBALS['dbLink'], "SELECT * FROM aircraft_weights WHERE tailnumber = " . $aircraft['id'] . " ORDER BY 'order' ASC");
 while($weights = mysqli_fetch_assoc($weights_query)) {
 	if ($weights['fuel']=="true") {
 		echo "df.line" . $weights['id'] . "_gallons.value = ";
@@ -61,7 +61,7 @@ function Process() {
 
 <?php
 
-$weights_query = mysqli_query("SELECT * FROM aircraft_weights WHERE tailnumber = " . $aircraft['id'] . " ORDER BY 'order' ASC");
+$weights_query = mysqli_query($GLOBALS['dbLink'], "SELECT * FROM aircraft_weights WHERE tailnumber = " . $aircraft['id'] . " ORDER BY 'order' ASC");
 while($weights = mysqli_fetch_assoc($weights_query)) {
 	if ($weights['fuel']=="true") {
 		echo "var line" . $weights['id'] . "_gallons = df.line" . $weights['id'] . "_gallons.value;\n";
@@ -181,7 +181,7 @@ isamap[3] = "_dn"
 
 <?php
 
-$weights_query = mysqli_query("SELECT * FROM aircraft_weights WHERE tailnumber = " . $aircraft['id'] . " ORDER BY  `aircraft_weights`.`order` ASC");
+$weights_query = mysqli_query($GLOBALS['dbLink'], "SELECT * FROM aircraft_weights WHERE tailnumber = " . $aircraft['id'] . " ORDER BY  `aircraft_weights`.`order` ASC");
 while($weights = mysqli_fetch_assoc($weights_query)) {
 	echo "<tr><td";
 	if ($weights['fuel']=="false") {
@@ -241,5 +241,5 @@ while($weights = mysqli_fetch_assoc($weights_query)) {
 ?>
 
 <?php PageFooter($config['administrator'],$ver);
-mysqli_close($con);
+mysqli_close($GLOBALS['dbLink']);
 ?>

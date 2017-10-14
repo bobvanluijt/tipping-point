@@ -4,16 +4,22 @@
 $ver = "0.9";
 $tabindex=1;
 
+$dbhost=""; //EDIT
 $dbname=""; // EDIT
 $dbuser=""; // EDIT
 $dbpass=""; // EDIT
 
 /* DON'T CHANGE BELOW */
 
-$con = mysqli_connect("localhost",$dbuser,$dbpass);
-mysqli_select_db($dbname, $con);
+$GLOBALS['dbLink'] = mysqli_connect($dbhost, $dbuser, $dbpass, $dbname);
 
-$config_result = mysqli_query("SELECT * FROM configuration");
+/* check connection */
+if (mysqli_connect_errno()) {
+    printf("Connect failed: Check your connection details!");
+    exit();
+}
+
+$config_result = mysqli_query($GLOBALS['dbLink'], "SELECT * FROM configuration");
 while($config_row = mysqli_fetch_assoc($config_result)) {
   $config{$config_row['item']}=$config_row['value'];
 }
@@ -85,8 +91,9 @@ function TimezoneList($str) {
 
 function AircraftListActive() {
 	echo "<select name=\"tailnumber\">\n";
-	$result = mysqli_query("SELECT * FROM aircraft WHERE active=1 ORDER BY tailnumber ASC");
-	while($row = mysqli_fetch_array($result)) {
+	$result = mysqli_query($GLOBALS['dbLink'], "SELECT * FROM aircraft WHERE active=1 ORDER BY tailnumber ASC");
+	
+	while($row = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
 		echo "<option value=\"" . $row['id'] . "\">" . $row['tailnumber'] . " - " . $row['makemodel'] . "</option>\n";
 	}
 	echo "</select>\n";
@@ -95,13 +102,13 @@ function AircraftListActive() {
 function AircraftListAll() {
 	echo "<select name=\"tailnumber\">\n";
 	echo "<optgroup label=\"Active\">\n";
-	$result = mysqli_query("SELECT * FROM aircraft WHERE active=1 ORDER BY tailnumber ASC");
+	$result = mysqli_query($GLOBALS['dbLink'], "SELECT * FROM aircraft WHERE active=1 ORDER BY tailnumber ASC");
 	while($row = mysqli_fetch_array($result)) {
 		echo "<option value=\"" . $row['id'] . "\">" . $row['tailnumber'] . " - " . $row['makemodel'] . "</option>\n";
 	}
 	echo "</optgroup>\n";
 	echo "<optgroup label=\"Inactive\">\n";
-	$result = mysqli_query("SELECT * FROM aircraft WHERE active=0 ORDER BY tailnumber ASC");
+	$result = mysqli_query($GLOBALS['dbLink'], "SELECT * FROM aircraft WHERE active=0 ORDER BY tailnumber ASC");
 	while($row = mysqli_fetch_array($result)) {
 		echo "<option value=\"" . $row['id'] . "\">" . $row['tailnumber'] . " - " . $row['makemodel'] . "</option>\n";
 	}

@@ -1,7 +1,7 @@
 <?php
 include 'func.inc.php';
 // GET AIRCRAFT CG DATA
-$result = mysqli_query("SELECT * FROM aircraft_cg WHERE tailnumber=" . $_REQUEST['tailnumber']);
+$result = mysqli_query($GLOBALS['dbLink'], "SELECT * FROM aircraft_cg WHERE tailnumber=" . $_REQUEST['tailnumber']);
 while($row = mysqli_fetch_array($result)) {
 	$arm[] = $row['arm'];
 	$weight[] = $row['weight'];
